@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Website Data Scraper",
+  "name": "LobbyX Data Scraper",
   "version": "1.0",
   "permissions": [
     "tabs",
     "scripting",
     "storage"
   ],
+  "icons": {
+    "32": "icons/icon32.png"
+  },
   "host_permissions": [
     "<all_urls>"
   ],
