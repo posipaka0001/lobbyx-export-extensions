@@ -1,39 +1,20 @@
-let urlsToVisit = [
-  // 'https://hirefire.thelobbyx.com/vacancies/689a339f138aa791a38cf3b4',
-  // 'https://hirefire.thelobbyx.com/vacancies/689a3340138aa791a38cf3b3',
-  // 'https://hirefire.thelobbyx.com/vacancies/68933b1a138aa791a38cea16',
-  'https://hirefire.thelobbyx.com/vacancies/6891f0d0ef38356c0dfe7fa4',
-
-  // 'https://hirefire.thelobbyx.com/vacancies/676eac052ccb84685fe17efb' // Front End Developer
-];
+let urlsToVisit = [];
 let currentIndex = 0;
-let data = [];
 let scrapeInProgress = false;
 
-chrome.action.onClicked.addListener(() => {
-  if (scrapeInProgress) return;
+chrome.action.onClicked.addListener(async () => {
   scrapeInProgress = true;
-
   showLoadingIcon();
 
-  console.log('Clicked on the browser');
+  urlsToVisit = await fetchVacancies();
+
   currentIndex = 0;
   openNextUrl();
 })
 
 chrome.runtime.onMessage.addListener((msg, sender) => {
   switch (msg.action) {
-    // case "start": {
-    //   urlsToVisit = msg.urls;
-    //   currentIndex = 0;
-    //   openNextUrl();
-    //
-    //   break;
-    // }
-
     case "dataExtracted": {
-      data = data.concat(msg.data)
-
       if (msg.numberOfPages) addAllPagesToURLs(msg.numberOfPages);
 
       currentIndex++;
@@ -47,7 +28,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 function openNextUrl() {
   if (currentIndex >= urlsToVisit.length) {
     scrapeInProgress = false;
-    console.log(data);
+    urlsToVisit = [];
+
     showDefaultIcon();
     // chrome.runtime.sendMessage({ action: "log", data: "✅ Done scraping!" });
     return;
@@ -77,4 +59,10 @@ function addAllPagesToURLs(numberOfPages) {
   });
 
   urlsToVisit.splice(currentIndex + 1, 0, ...restPages);
+}
+
+async function fetchVacancies() {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbwrt52GVYs93h1tgvqJzXKRpZ9dBGx2qaGM_VOnfDrApYg7A53CozJjaKyOpOUQaUY/exec');
+
+  return response.json();
 }

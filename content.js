@@ -18,7 +18,7 @@
 
     files && Array.from(files).forEach((file) => {
       if (file.textContent.includes('CV')) {
-        fields.cvLink = window.location.href + file.href;
+        fields.cvLink = file.href;
       }
     })
 
@@ -34,12 +34,12 @@
   console.log(data)
 
   if (isFirstPage && numberOfPages) {
-    chrome.runtime.sendMessage({ action: "dataExtracted", data, numberOfPages });
+    chrome.runtime.sendMessage({ action: "dataExtracted", numberOfPages });
   } else {
-    chrome.runtime.sendMessage({ action: "dataExtracted", data });
+    chrome.runtime.sendMessage({ action: "dataExtracted" });
   }
 
-  window.close();
+  // window.close();
 })();
 
 function parsePhoneNumber(text) {
@@ -68,5 +68,5 @@ function parseDate(str) {
 
   const date = new Date(year, month - 1, day, hours, minutes);
 
-  return date.toISOString();
+  return date.getTime();
 }
