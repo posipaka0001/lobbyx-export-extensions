@@ -12,10 +12,16 @@ chrome.action.onClicked.addListener(async () => {
   openNextUrl();
 })
 
-chrome.runtime.onMessage.addListener((msg, sender) => {
+chrome.runtime.onMessage.addListener(async (msg, sender) => {
   switch (msg.action) {
     case "dataExtracted": {
-      if (msg.numberOfPages) addAllPagesToURLs(msg.numberOfPages);
+      const response = await sendDataToBackend(msg.data);
+
+      if (response.someCandidatesAlreadyExist) {
+        skipNextPages();
+      } else if(msg.numberOfPages) {
+        addAllPagesToURLs(msg.numberOfPages);
+      }
 
       currentIndex++;
       openNextUrl();
@@ -61,8 +67,26 @@ function addAllPagesToURLs(numberOfPages) {
   urlsToVisit.splice(currentIndex + 1, 0, ...restPages);
 }
 
+function skipNextPages() {
+  const currentURL = urlsToVisit[currentIndex];
+
+  urlsToVisit = urlsToVisit.filter(url => !url.startsWith(`${currentURL}?page=`));
+}
+
 async function fetchVacancies() {
   const response = await fetch('https://script.google.com/macros/s/AKfycbwrt52GVYs93h1tgvqJzXKRpZ9dBGx2qaGM_VOnfDrApYg7A53CozJjaKyOpOUQaUY/exec');
+
+  return response.json();
+}
+
+async function sendDataToBackend(data) {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbwmMM2SvGPBanKJBlCvC12uMtVTkbYtl02Vhh72D2lnjLlC9J9iygBSv8GNmMQy4Zc/exec', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
 
   return response.json();
 }

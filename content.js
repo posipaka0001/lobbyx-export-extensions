@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   const candidates = document.querySelectorAll('[data-candidate]')
 
   const data = candidates ? Array.from(candidates).map(candidate => {
@@ -34,9 +34,9 @@
   console.log(data)
 
   if (isFirstPage && numberOfPages) {
-    chrome.runtime.sendMessage({ action: "dataExtracted", numberOfPages });
+    chrome.runtime.sendMessage({ action: "dataExtracted", data, numberOfPages });
   } else {
-    chrome.runtime.sendMessage({ action: "dataExtracted" });
+    chrome.runtime.sendMessage({ action: "dataExtracted", data });
   }
 
   // window.close();
