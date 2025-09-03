@@ -1,6 +1,7 @@
 let urlsToVisit = [];
 let currentIndex = 0;
 let scrapeInProgress = false;
+let data = [];
 
 chrome.action.onClicked.addListener(async () => {
   scrapeInProgress = true;
@@ -10,21 +11,32 @@ chrome.action.onClicked.addListener(async () => {
 
   currentIndex = 0;
   openNextUrl();
-})
+});
+
 
 chrome.runtime.onMessage.addListener(async (msg, sender) => {
   switch (msg.action) {
     case "dataExtracted": {
-      const response = await sendDataToBackend(msg.data);
+      data = data.concat(msg.data);
 
-      if (response.someCandidatesAlreadyExist) {
-        skipNextPages();
-      } else if(msg.numberOfPages) {
+      if(msg.numberOfPages) {
         addAllPagesToURLs(msg.numberOfPages);
       }
 
       currentIndex++;
-      openNextUrl();
+
+      if (currentIndex >= urlsToVisit.length) {
+        scrapeInProgress = false;
+        urlsToVisit = [];
+
+        await sendDataToBackend(data);
+
+        showDefaultIcon();
+
+        return;
+      } else {
+        openNextUrl();
+      }
 
       break;
     }
@@ -32,15 +44,6 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 });
 
 function openNextUrl() {
-  if (currentIndex >= urlsToVisit.length) {
-    scrapeInProgress = false;
-    urlsToVisit = [];
-
-    showDefaultIcon();
-    // chrome.runtime.sendMessage({ action: "log", data: "✅ Done scraping!" });
-    return;
-  }
-
   chrome.tabs.create({ url: urlsToVisit[currentIndex], active: false }, (tab) => {
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -80,13 +83,13 @@ async function fetchVacancies() {
 }
 
 async function sendDataToBackend(data) {
-  const response = await fetch('https://script.google.com/macros/s/AKfycbwmMM2SvGPBanKJBlCvC12uMtVTkbYtl02Vhh72D2lnjLlC9J9iygBSv8GNmMQy4Zc/exec', {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbzNXEh1QobI_5hXQegvxV8tEOa_H4wdaGTnMxX6h05gwJZtJ7D081tXANs_LvA_XHA/exec', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-  })
+  });
 
   return response.json();
 }

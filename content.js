@@ -39,7 +39,7 @@
     chrome.runtime.sendMessage({ action: "dataExtracted", data });
   }
 
-  // window.close();
+  window.close();
 })();
 
 function parsePhoneNumber(text) {
