@@ -19,9 +19,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
     case "dataExtracted": {
       data = data.concat(msg.data);
 
-      if(msg.numberOfPages) {
-        addAllPagesToURLs(msg.numberOfPages);
-      }
+      if(msg.numberOfPages) addAllPagesToURLs(msg.numberOfPages);
 
       currentIndex++;
 
@@ -33,10 +31,10 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
 
         showDefaultIcon();
 
-        return;
-      } else {
-        openNextUrl();
+        break;
       }
+
+      openNextUrl();
 
       break;
     }
