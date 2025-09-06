@@ -31,15 +31,13 @@
   const urlParams = new URLSearchParams(window.location.search);
   const isFirstPage = !urlParams.has('page');
 
-  console.log(data)
-
   if (isFirstPage && numberOfPages) {
     chrome.runtime.sendMessage({ action: "dataExtracted", data, numberOfPages });
   } else {
     chrome.runtime.sendMessage({ action: "dataExtracted", data });
   }
 
-  // window.close();
+  window.close();
 })();
 
 function parsePhoneNumber(text) {

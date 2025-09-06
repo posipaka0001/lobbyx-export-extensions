@@ -10,7 +10,7 @@ chrome.action.onClicked.addListener(async () => {
 
   currentIndex = 0;
   openNextUrl();
-})
+});
 
 chrome.runtime.onMessage.addListener(async (msg, sender) => {
   switch (msg.action) {
@@ -80,7 +80,7 @@ async function fetchVacancies() {
 }
 
 async function sendDataToBackend(data) {
-  const response = await fetch('https://script.google.com/macros/s/AKfycbwmMM2SvGPBanKJBlCvC12uMtVTkbYtl02Vhh72D2lnjLlC9J9iygBSv8GNmMQy4Zc/exec', {
+  const response = await fetch('http://localhost:3000/applications', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
